@@ -69,7 +69,6 @@ public class HuffmanDecoder {
             // Hay que crear un árbol de Huffman para descomprimir. PROBLEMAS CON EL ARBOL. EN VEZ DE DECODIFICAR. CORREGIR
             HuffmanTree arbol = HuffmanTree.of(diccionario);
             HuffmanIterator iterator = arbol.getIterator();
-            arbol.imprimirArbol();
 
             // Hay que decodificar el archivo usando el árbol. recorrer el árbol con el iterador. al llegar una hoja, append el carácter
             stringBuilder.delete(0, stringBuilder.length()); // limpiamos el stringbuilder para no declarar otro (reciclaje de la variable)
@@ -78,7 +77,6 @@ public class HuffmanDecoder {
             iterator.reset();
 
             while (read > -1){
-                System.out.println("Nodo "+iterator.getValue());
                 if (iterator.isLeaf()) {
                     // si el nodo actual es una hoja, rescatar el byte del nodo e interpretarlo como caracter
                     stringBuilder.append((char) iterator.getValue()); // rescatamos el byte y lo interpretamos como caracter
@@ -87,7 +85,6 @@ public class HuffmanDecoder {
                     leido++;
                 } else {
                     read = inputStream.read();
-                    System.out.println(read);
                     if (read == 48) { // si es 1. 49 en ASCII es 1
                         // bajar a la izquierda
                         iterator.forward(false);
@@ -97,7 +94,6 @@ public class HuffmanDecoder {
                     }
                 }
             }
-            System.out.println(stringBuilder);
 
 
         } catch (FileNotFoundException e) {

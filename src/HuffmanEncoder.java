@@ -37,13 +37,7 @@ public class HuffmanEncoder {
     public void encode() {
         long[] tablaFrecuencias = generarTablaDeFrecuencias();
         HuffmanTree arbolH = HuffmanTree.of(tablaFrecuencias);
-        arbolH.imprimirArbol();
         String[] encodeTable = arbolH.encodeTable();
-        for (int i = 0; i < encodeTable.length; i++) {
-            if(encodeTable[i] != null){
-                System.out.println((char) i +" "+encodeTable[i]);
-            }
-        }
 
         try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile));
              DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(outputFile))) {
@@ -53,23 +47,19 @@ public class HuffmanEncoder {
             outputStream.writeByte(124);
 
             // Leer el archivo de entrada y generar la secuencia de bits comprimidos
-            // Ejemplo: h -> 01 FUNCIONA
             // llega "h", tomamos el codigo ascii, buscamos el codigo huffman en el índice de "h" en ascii en la tablaFrecuencias y lo concatenamos con la salida
             // aqui esta el problema. el orden de la codificacion debe ser en orden de lectura del archivo original
+            // Aqui tenia un problema. resulta que codificaba recorriendo la tabla de frecuencias, cuando debia ir leyendo dato por dato del inputFile e ir concatenando los codigos huffman
             StringBuilder secuencia = new StringBuilder();
-            String lectura = "";
+            String lectura = String.valueOf(inputStream.read());
 
             while(!lectura.equals("-1")){
+                secuencia.append(encodeTable[Integer.parseInt(lectura)]);
                 lectura = String.valueOf(inputStream.read());
-                if(!lectura.equals("-1")){
-                    secuencia.append(encodeTable[Integer.parseInt(lectura)]);
-                }
-                System.out.println(lectura);
             }
 
             // Convertir la secuencia de bits en un array de bytes
             String secuenciaEnBits = secuencia.toString();
-            System.out.println("Secuencia: "+secuenciaEnBits);
             byte longitudCompress = (byte) secuenciaEnBits.length();
             byte[] datosCompress = new byte[(secuenciaEnBits.length() + 7) / 8];
 
