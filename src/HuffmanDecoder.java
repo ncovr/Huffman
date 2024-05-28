@@ -66,10 +66,10 @@ public class HuffmanDecoder {
             }
             inputStream.read();
 
-            // Hay que crear un árbol de Huffman para descomprimir. PROBLEMAS CON EL ARBOL. EN VEZ DE DECODIFICAR hola, hh
+            // Hay que crear un árbol de Huffman para descomprimir. PROBLEMAS CON EL ARBOL. EN VEZ DE DECODIFICAR. CORREGIR
             HuffmanTree arbol = HuffmanTree.of(diccionario);
             HuffmanIterator iterator = arbol.getIterator();
-            arbol.printNodesAndChildren();
+            arbol.imprimirArbol();
 
             // Hay que decodificar el archivo usando el árbol. recorrer el árbol con el iterador. al llegar una hoja, append el carácter
             stringBuilder.delete(0, stringBuilder.length()); // limpiamos el stringbuilder para no declarar otro (reciclaje de la variable)
@@ -90,10 +90,10 @@ public class HuffmanDecoder {
                     System.out.println(read);
                     if (read == 48) { // si es 1. 49 en ASCII es 1
                         // bajar a la izquierda
-                        iterator.forward(true);
+                        iterator.forward(false);
                     } else {
                         // bajar a la derecha
-                        iterator.forward(false);
+                        iterator.forward(true);
                     }
                 }
             }

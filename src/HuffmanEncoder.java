@@ -1,7 +1,4 @@
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Clase para codificar datos utilizando el algoritmo de Huffman.
@@ -40,26 +37,39 @@ public class HuffmanEncoder {
     public void encode() {
         long[] tablaFrecuencias = generarTablaDeFrecuencias();
         HuffmanTree arbolH = HuffmanTree.of(tablaFrecuencias);
+        arbolH.imprimirArbol();
         String[] encodeTable = arbolH.encodeTable();
+        for (int i = 0; i < encodeTable.length; i++) {
+            if(encodeTable[i] != null){
+                System.out.println((char) i +" "+encodeTable[i]);
+            }
+        }
 
         try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile));
              DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(outputFile))) {
 
             // Escribir las frecuencias en el archivo de salida
-            writeTableInDaArchive(tablaFrecuencias, outputStream);
+            escribirTablaEnArchivo(tablaFrecuencias, outputStream);
             outputStream.writeByte(124);
 
             // Leer el archivo de entrada y generar la secuencia de bits comprimidos
             // Ejemplo: h -> 01 FUNCIONA
+            // llega "h", tomamos el codigo ascii, buscamos el codigo huffman en el índice de "h" en ascii en la tablaFrecuencias y lo concatenamos con la salida
+            // aqui esta el problema. el orden de la codificacion debe ser en orden de lectura del archivo original
             StringBuilder secuencia = new StringBuilder();
-            for (int i = 0; i < tablaFrecuencias.length; i++) {
-                if (tablaFrecuencias[i] > 0) {
-                    secuencia.append(encodeTable[i]);
+            String lectura = "";
+
+            while(!lectura.equals("-1")){
+                lectura = String.valueOf(inputStream.read());
+                if(!lectura.equals("-1")){
+                    secuencia.append(encodeTable[Integer.parseInt(lectura)]);
                 }
+                System.out.println(lectura);
             }
 
             // Convertir la secuencia de bits en un array de bytes
             String secuenciaEnBits = secuencia.toString();
+            System.out.println("Secuencia: "+secuenciaEnBits);
             byte longitudCompress = (byte) secuenciaEnBits.length();
             byte[] datosCompress = new byte[(secuenciaEnBits.length() + 7) / 8];
 
@@ -74,7 +84,6 @@ public class HuffmanEncoder {
             outputStream.writeByte(124);
             outputStream.write(secuencia.toString().getBytes());
 
-            System.out.println(convertirEnteroASerieDeBits(longitudCompress));
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -115,7 +124,7 @@ public class HuffmanEncoder {
      * *     Función por fines de simplificación de código
      * * </p>
      */
-    private void writeTableInDaArchive(long[] tabla, DataOutputStream writer) throws IOException {
+    private void escribirTablaEnArchivo(long[] tabla, DataOutputStream writer) throws IOException {
         String binaryString = "";
         for (Long l : tabla) {
             binaryString = String.format("%8s", Integer.toBinaryString((int) (l & 0xFF))).replace(' ', '0');

@@ -87,35 +87,15 @@ public class HuffmanTree {
     private void generateCodes(Nodo node, String code, String[] out) {
         if (node == null) return;
 
-        // si el nodo entregado por parametro es una hoja, significa que podemos acceder al caracter y a su ocurrencia
+        // si el nodo es una hoja, asigna el código a ese carácter ((byte) del caracter)
         if (node.izquierdo == null && node.derecho == null) {
-            out[node.byteCode & 0xFF] = code; // lo que esta entre corchetes trata de una operación de bits. en este caso nos sirve para entregar un entero sin signo
+            out[node.byteCode & 0xFF] = code;
         } else {
-            // sino, pasa a los nodos hijos de izquierda a derecha (asignandoles el 0 o 1 según corresponda)
+            // pasa a los nodos hijos de izquierda a derecha (asignándoles el 0 o 1 según corresponda)
             generateCodes(node.izquierdo, code + "0", out);
             generateCodes(node.derecho, code + "1", out);
         }
     }
-
-    public void printNodesAndChildren() {
-        printNodesAndChildrenRecursive(raiz, "");
-    }
-
-    private void printNodesAndChildrenRecursive(Nodo nodo, String prefix) {
-        if (nodo == null) {
-            return;
-        }
-
-        System.out.println(prefix + (char) nodo.byteCode + " -> [" + (nodo.izquierdo != null ? (char) nodo.izquierdo.byteCode : "null") + ", " + (nodo.derecho != null ? (char) nodo.derecho.byteCode : "null") + "]");
-
-        if (nodo.izquierdo != null) {
-            printNodesAndChildrenRecursive(nodo.izquierdo, prefix + "  ");
-        }
-        if (nodo.derecho != null) {
-            printNodesAndChildrenRecursive(nodo.derecho, prefix + "  ");
-        }
-    }
-
 
 
     public void imprimirArbol() {
@@ -133,7 +113,7 @@ public class HuffmanTree {
         if (nodo == null) {
             return;
         }
-        System.out.println(prefix + (isTail ? "└── " : "├── ") + nodo.byteCode + "(" + nodo.frecuencia + ")");
+        System.out.println(prefix + (isTail ? "└── " : "├── ") + (char) nodo.byteCode + " " + nodo.byteCode + "(" + nodo.frecuencia + ")");
         if (nodo.izquierdo != null || nodo.derecho != null) {
             if (nodo.izquierdo != null) {
                 imprimirArbolRecursivo(nodo.izquierdo, prefix + (isTail ? "    " : "│   "), nodo.derecho == null);
@@ -167,17 +147,17 @@ public class HuffmanTree {
         }
 
         //se deben implementar todos los métodos de la clase
-        @Override
+        @Override // reinicia la iteración volviendo a la raiz
         public void reset() {
             actual = head;
         }
 
-        @Override
+        @Override // retorna el valor en byte del caracter
         public byte getValue() {
             return actual.byteCode;
         }
 
-        @Override
+        @Override // avanza segun el valor del bit. true: derecho, false: izquierdo
         public void forward(boolean bit) {
             if(bit){
                 actual = actual.derecho;

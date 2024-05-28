@@ -22,10 +22,10 @@ public class Huffman {
     // [archivo sin comprimir] y [archivo.huff] corresponden a las rutas de los archivos
 
     public static void main(String[] args) {
-        HuffmanEncoder huffmanEncoder = new HuffmanEncoder("C:\\Users\\Nicolás Verdugo\\Desktop\\textoKLO.txt", "C:\\Users\\Nicolás Verdugo\\Desktop\\textoKLOcompressed.txt");
+        HuffmanEncoder huffmanEncoder = new HuffmanEncoder("C:\\Users\\Nicolás Verdugo\\Desktop\\textoNatural.txt", "C:\\Users\\Nicolás Verdugo\\Desktop\\textocompressed.txt");
         huffmanEncoder.encode(); // implementar: comprimir el primer archivo entregado
 
-        HuffmanDecoder huffmanDecoder = new HuffmanDecoder("C:\\Users\\Nicolás Verdugo\\Desktop\\textoKLOcompressed.txt","C:\\Users\\Nicolás Verdugo\\Desktop\\textoKLOdescompressed.txt");
+        HuffmanDecoder huffmanDecoder = new HuffmanDecoder("C:\\Users\\Nicolás Verdugo\\Desktop\\textocompressed.txt","C:\\Users\\Nicolás Verdugo\\Desktop\\textodescompressed.txt");
         huffmanDecoder.decode();
 
 //        if(args.length<3){
