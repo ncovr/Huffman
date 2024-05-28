@@ -1,0 +1,10 @@
+Hola a todos,
+este es un ejemplo de archivo de texto.
+
+Aquí va el mensaje que se quiere codificar
+con huffman.
+
+La compresión de texto con huffman no es lo mejor,
+pero fue el primer compresor de la Historia.
+
+que lo disfruten.

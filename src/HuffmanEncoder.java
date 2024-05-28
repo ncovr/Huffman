@@ -1,0 +1,137 @@
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Clase para codificar datos utilizando el algoritmo de Huffman.
+ * Esta clase proporciona funcionalidades para comprimir datos utilizando el algoritmo de Huffman.
+ */
+public class HuffmanEncoder {
+
+    /**
+     * Ruta al archivo de entrada.
+     */
+    private String inputFile;
+
+    /**
+     * Ruta al archivo de salida.
+     */
+    private String outputFile;
+
+    /**
+     * Constructor de la clase HuffmanEncoder.
+     *
+     * @param inputFile  Ruta al archivo de entrada que se desea comprimir.
+     * @param outputFile Ruta al archivo de salida donde se almacenará la versión comprimida de los datos.
+     */
+
+    public HuffmanEncoder(String inputFile, String outputFile) {
+        this.inputFile = inputFile;
+        this.outputFile = outputFile;
+    }
+
+
+    /**
+     * lee el archivo de entrada y lo comprime usando Huffman, en el archivo de salida.
+     * formato archivo de salida:
+     * long[256] frecuencias|long largo_en_bits|bits archivo comprimido...
+     */
+    public void encode() {
+        long[] tablaFrecuencias = generarTablaDeFrecuencias();
+        HuffmanTree arbolH = HuffmanTree.of(tablaFrecuencias);
+        String[] encodeTable = arbolH.encodeTable();
+
+        try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile));
+             DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(outputFile))) {
+
+            // Escribir las frecuencias en el archivo de salida
+            writeTableInDaArchive(tablaFrecuencias, outputStream);
+            outputStream.writeByte(124);
+
+            // Leer el archivo de entrada y generar la secuencia de bits comprimidos
+            // Ejemplo: h -> 01 FUNCIONA
+            StringBuilder secuencia = new StringBuilder();
+            for (int i = 0; i < tablaFrecuencias.length; i++) {
+                if (tablaFrecuencias[i] > 0) {
+                    secuencia.append(encodeTable[i]);
+                }
+            }
+
+            // Convertir la secuencia de bits en un array de bytes
+            String secuenciaEnBits = secuencia.toString();
+            byte longitudCompress = (byte) secuenciaEnBits.length();
+            byte[] datosCompress = new byte[(secuenciaEnBits.length() + 7) / 8];
+
+            for (int i = 0; i < secuenciaEnBits.length(); i++) {
+                if (secuenciaEnBits.charAt(i) == '1') {
+                    datosCompress[i / 8] |= (128 >> (i % 8));
+                }
+            }
+
+            // Escribir la longitud en bits y los datos comprimidos
+            outputStream.write(convertirEnteroASerieDeBits(longitudCompress).getBytes());
+            outputStream.writeByte(124);
+            outputStream.write(secuencia.toString().getBytes());
+
+            System.out.println(convertirEnteroASerieDeBits(longitudCompress));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Genera una tabla de frecuencias para los datos proporcionados en el archivo de entrada.
+     * Esta tabla representa la frecuencia de cada byte del archivo de entrada.
+     *
+     * @return Una array de tipo long donde cada índice representa un valor único
+     * en los datos y el valor en ese índice representa la frecuencia de ese valor.
+     */
+    public long[] generarTablaDeFrecuencias() {
+        //abre el archivo y cuenta la frecuencia de cada byte (8bits). Cada byte se puede interpretar como un caracter
+        //de la tabla ASCII
+        long[] out = new long[256];
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(inputFile));// abre el archivo
+            String linea; // representa cada linea del archivo de texto
+            while ((linea = reader.readLine()) != null) {
+                for (char character : linea.toCharArray()) { // se recorre cada caracter de la linea y se cuenta su frecuencia
+                    // contar la frecuencia. en la posición ASCII del char sumar 1
+                    out[(int) character] += 1;
+                }
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return out;
+    }
+
+    /**
+     * <p>
+     * Escribir cada frecuencia en formato de bits en el archivo de salida
+     * </p><p>
+     * *     Función por fines de simplificación de código
+     * * </p>
+     */
+    private void writeTableInDaArchive(long[] tabla, DataOutputStream writer) throws IOException {
+        String binaryString = "";
+        for (Long l : tabla) {
+            binaryString = String.format("%8s", Integer.toBinaryString((int) (l & 0xFF))).replace(' ', '0');
+            writer.write(binaryString.getBytes());
+        }
+    }
+
+    /**
+     * Funcion que convierte, por ejemplo, 8 en 00000000000000000000000000001000
+     * */
+    public String convertirEnteroASerieDeBits(int numero) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 31; i >= 0; i--) {
+            int bit = (numero >> i) & 1;
+            sb.append(bit);
+        }
+        return sb.toString();
+    }
+}
