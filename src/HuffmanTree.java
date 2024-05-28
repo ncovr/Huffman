@@ -97,6 +97,27 @@ public class HuffmanTree {
         }
     }
 
+    public void printNodesAndChildren() {
+        printNodesAndChildrenRecursive(raiz, "");
+    }
+
+    private void printNodesAndChildrenRecursive(Nodo nodo, String prefix) {
+        if (nodo == null) {
+            return;
+        }
+
+        System.out.println(prefix + (char) nodo.byteCode + " -> [" + (nodo.izquierdo != null ? (char) nodo.izquierdo.byteCode : "null") + ", " + (nodo.derecho != null ? (char) nodo.derecho.byteCode : "null") + "]");
+
+        if (nodo.izquierdo != null) {
+            printNodesAndChildrenRecursive(nodo.izquierdo, prefix + "  ");
+        }
+        if (nodo.derecho != null) {
+            printNodesAndChildrenRecursive(nodo.derecho, prefix + "  ");
+        }
+    }
+
+
+
     public void imprimirArbol() {
         imprimirArbolRecursivo(raiz, "", true);
     }
@@ -158,7 +179,9 @@ public class HuffmanTree {
 
         @Override
         public void forward(boolean bit) {
-            actual = bit ? actual.derecho : actual.izquierdo;
+            if(bit){
+                actual = actual.derecho;
+            } else actual = actual.izquierdo;
         }
 
         @Override
