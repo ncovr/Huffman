@@ -97,6 +97,31 @@ public class HuffmanTree {
         }
     }
 
+    public void imprimirArbol() {
+        imprimirArbolRecursivo(raiz, "", true);
+    }
+
+    /**
+     * Método privado que realiza un recorrido preorden para imprimir el árbol de Huffman. Por ChatGPT
+     *
+     * @param nodo El nodo actual.
+     * @param prefix El prefijo para representar la estructura del árbol.
+     * @param isTail Indica si es el último nodo.
+     */
+    private void imprimirArbolRecursivo(Nodo nodo, String prefix, boolean isTail) {
+        if (nodo == null) {
+            return;
+        }
+        System.out.println(prefix + (isTail ? "└── " : "├── ") + nodo.byteCode + "(" + nodo.frecuencia + ")");
+        if (nodo.izquierdo != null || nodo.derecho != null) {
+            if (nodo.izquierdo != null) {
+                imprimirArbolRecursivo(nodo.izquierdo, prefix + (isTail ? "    " : "│   "), nodo.derecho == null);
+            }
+            if (nodo.derecho != null) {
+                imprimirArbolRecursivo(nodo.derecho, prefix + (isTail ? "    " : "│   "), true);
+            }
+        }
+    }
 
     /**
      * Obtiene un iterador para recorrer el árbol de Huffman.

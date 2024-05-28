@@ -41,7 +41,7 @@ public class HuffmanDecoder {
         try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(inputFileName));
              DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(outputFileName))) {
 
-            // Hay que leer el diccionario de 256 long
+            // Hay que leer el diccionario de 256 long FUNCIONA
             long[] diccionario = new long[256]; // frecuencias de cada caracter
             int contador = 0;
             StringBuilder stringBuilder = new StringBuilder();
@@ -58,7 +58,7 @@ public class HuffmanDecoder {
             }
             inputStream.read();
 
-            // Hay que leer el total de bits (importante para no leer basura)
+            // Hay que leer el total de bits (importante para no leer basura) FUNCIONA
             int totalBits = 0;
             for (int i = 0; i < 32; i++) { // leer 32 bits
                 totalBits <<= 1;
@@ -66,19 +66,24 @@ public class HuffmanDecoder {
             }
             inputStream.read();
 
-            // Hay que crear un árbol de Huffman para descomprimir
+            // Hay que crear un árbol de Huffman para descomprimir. PROBLEMAS CON EL ARBOL. EN VEZ DE DECODIFICAR hola, hh
             HuffmanTree arbol = HuffmanTree.of(diccionario);
             HuffmanIterator iterator = arbol.getIterator();
+            arbol.imprimirArbol();
 
             // Hay que decodificar el archivo usando el árbol. recorrer el árbol con el iterador. al llegar una hoja, append el carácter
             stringBuilder.delete(0, stringBuilder.length()); // limpiamos el stringbuilder para no declarar otro (reciclaje de la variable)
-            for (int i = 0; i < totalBits; i++) {
+            int leido = 0;
+            int read = inputStream.read();
+            while (leido <= totalBits){
                 if (iterator.isLeaf()) {
                     // si el nodo actual es una hoja, rescatar el byte del nodo e interpretarlo como caracter
                     stringBuilder.append((char) iterator.getValue()); // rescatamos el byte y lo interpretamos como caracter
+                    outputStream.write((char) iterator.getValue()); // escribe en el archivo de salida
                     iterator.reset(); // volver a la raiz (nodo actual = raiz del arbol)
+                    leido++;
                 } else {
-                    if (inputStream.read() == 0) {
+                    if (read == 0) {
                         // bajar a la izquierda
                         iterator.forward(false);
                     } else {
@@ -86,6 +91,8 @@ public class HuffmanDecoder {
                         iterator.forward(true);
                     }
                 }
+                System.out.println("nodo: "+iterator.getValue());
+                System.out.println(read);
             }
             System.out.println(stringBuilder);
 
