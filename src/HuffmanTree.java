@@ -29,32 +29,33 @@ public class HuffmanTree {
         tree.generarArbol(frecuencias);
         return tree;
     }
+
     /**
      * Genera el árbol de Huffman a partir de un arreglo de frecuencias.
      * <p>
      * Cada nodo hoja conserva el caracter y su frecuencia de aparicion en la frase. Cada nodo hoja es hijo de un padre que conserva la suma de la frecuencia de sus hijos (que son dos por ser un arbol binomial)
-     *</p>
+     * </p>
+     *
      * @param frecuencias Arreglo de frecuencias de bytes.
      */
     public void generarArbol(long[] frecuencias) {
         // uso de min-heap obligatorio
         PriorityQueue<Nodo> minHeap = new PriorityQueue<>();
 
-        // crear nodos con sus caracteres y sus frecuencias
-        for (int i = 0; i < frecuencias.length; i++) { // recorremos las frecuancias
-            if (frecuencias[i] > 0) { // si la frecuencia es cero, no almacenamos nada
-                minHeap.add(new Nodo((byte) i, frecuencias[i]));
-                // nuevo nodo(posición del caracter en la lista expresado en bytes, número de ocurrencias)
+        // crear nodos con sus caracteres (en byte) y sus frecuencias
+        for (int i = 0; i < frecuencias.length; i++) { // recorremos las frecuencias
+            if (frecuencias[i] > 0) { // Añadimos al minHeap solo los nodos que tienen una frecuencia mayor a 0
+                minHeap.add(new Nodo((byte) i, frecuencias[i])); // Nuevo nodo: codigo ASCII del caracter en la posición i, su frecuencia
             }
         }
 
         // Contruccion del árbol. En cada iteración se extraen nodos del minHeap. Itera hasta que quede un nodo en el arbol
+        // Se se retiran dos menores del minHeap y se hacen hermanos a través de un padre que almacena la suma de sus frecuencias
         while (minHeap.size() > 1) {
             Nodo i = minHeap.poll(); // retira el primer elemento del minHeap que seria el minimo de la lista
-            Nodo d = minHeap.poll(); // para hacerlo hermano del siguiente en la lista y asi crear un nodo padre que los relacione
-            Nodo p = new Nodo((byte) 0, i.frecuencia + d.frecuencia, i, d);
-            // new nodo en el arbol: posicion del caracter en tabla ASCII, suma de frecuencia de sus hijos, hijo iz, hijo der
-            minHeap.add(p); // añadir el nuevo nodo al arbol
+            Nodo d = minHeap.poll(); // para hacerlo hermano del siguiente en la lista y asi crear un nodo padre que los relacione a traves de la suma de sus frecuencias
+            Nodo p = new Nodo((byte) 0, i.frecuencia + d.frecuencia, i, d); // Nuevo nodo: no relevante, suma de ambas frecuencias, nodo hijo izquierdo, nodo hijo derecho
+            minHeap.add(p); // añadir el nuevo nodo al minHeap
         }
 
         // en este punto solo quedaría un elemento en el minHeap, el cual es la raiz de este arbol
@@ -87,13 +88,11 @@ public class HuffmanTree {
     private void generateCodes(Nodo node, String code, String[] out) {
         if (node == null) return;
 
-        // si el nodo es una hoja, asigna el código a ese carácter ((byte) del caracter)
-        if (node.izquierdo == null && node.derecho == null) {
-            out[node.byteCode & 0xFF] = code;
-        } else {
-            // pasa a los nodos hijos de izquierda a derecha (asignándoles el 0 o 1 según corresponda)
-            generateCodes(node.izquierdo, code + "0", out);
-            generateCodes(node.derecho, code + "1", out);
+        if (node.izquierdo == null && node.derecho == null) { // Si el nodo es una hoja
+            out[node.byteCode & 0xFF] = code; // Se lsigna el código que se ha ido generando recursivamente en la posicion del caracter
+        } else { // Accede recursivamente a los hijos del nodo
+            generateCodes(node.izquierdo, code + "0", out); // Concatenando un 0 si accede a la izquierda
+            generateCodes(node.derecho, code + "1", out); // O un 1 si accede a la derecha
         }
     }
 
@@ -126,19 +125,17 @@ public class HuffmanTree {
             actual = head;
         }
 
-        @Override // retorna el valor en byte del caracter
+        @Override // retorna el valor en byte del caracter actual
         public byte getValue() {
             return actual.byteCode;
         }
 
-        @Override // avanza segun el valor del bit. true: derecho, false: izquierdo
+        @Override // avanza al próximo nodo segun el valor de bit. true: derecho, false: izquierdo
         public void forward(boolean bit) {
-            if(bit){
-                actual = actual.derecho;
-            } else actual = actual.izquierdo;
+            actual = bit ? actual.derecho : actual.izquierdo;
         }
 
-        @Override
+        @Override // Retorna true si el nodo actual es una hoja o false si no lo es
         public boolean isLeaf() { // cuando no tiene hijos y no es nulo
             return actual != null && actual.izquierdo == null && actual.derecho == null;
         }

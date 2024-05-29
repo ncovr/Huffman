@@ -22,25 +22,28 @@ public class Huffman {
     // [archivo sin comprimir] y [archivo.huff] corresponden a las rutas de los archivos
 
     public static void main(String[] args) {
-        HuffmanEncoder huffmanEncoder = new HuffmanEncoder("C:\\Users\\Nicolás Verdugo\\Desktop\\textoNatural.txt", "C:\\Users\\Nicolás Verdugo\\Desktop\\textocompressed.txt");
-        huffmanEncoder.encode(); // implementar: comprimir el primer archivo entregado
+        /*// Para probar el programa sin CMD
+        String archivoInicial = ""; // Establezca ruta del archivo
+        String archivoComprimido = ""; // Establezca ruta del archivo
+        String archivoDescomprimido = ""; // Establezca ruta del archivo
+        HuffmanEncoder huffmanEncoder = new HuffmanEncoder(archivoInicial, archivoComprimido);
+        huffmanEncoder.encode(); // Codifica
+        HuffmanDecoder huffmanDecoder = new HuffmanDecoder(archivoComprimido,archivoDescomprimido);
+        huffmanDecoder.decode(); // Decodifica*/
 
-        HuffmanDecoder huffmanDecoder = new HuffmanDecoder("C:\\Users\\Nicolás Verdugo\\Desktop\\textocompressed.txt","C:\\Users\\Nicolás Verdugo\\Desktop\\textodescompressed.txt");
-        huffmanDecoder.decode();
-
-//        if(args.length<3){
-//            help(); // explica que deben el programa espera este formato: java Huffman [opcion] [archivo.huff] [archivo sin comprimir]
-//        }else if(args[0].equalsIgnoreCase("-c")){
-//            // si la opción es -c, el programa debe comprimir el archivo [archivo sin comprimir], entregándolo como [archivo.huff]
-//            HuffmanEncoder huffmanEncoder=new HuffmanEncoder(args[2]/*[archivo sin comprimir]*/,args[1]/*[archivo.huff]*/);
-//            huffmanEncoder.encode(); // implementar: comprimir el primer archivo entregado
-//        }else if(args[0].equalsIgnoreCase(("-d"))){
-//            // si la opcion es -d, el programa debe descomprimir el [archivo.huff] entregando [archivo sin comprimir]
-//            HuffmanDecoder huffmanDecoder=new HuffmanDecoder(args[1],args[2]);
-//            huffmanDecoder.decode();
-//        }else{
-//            help();
-//        }
+        if (args.length < 3) {
+            help(); // explica que el programa espera este formato: java Huffman [opcion] [archivo.huff] [archivo sin comprimir]
+        } else if (args[0].equalsIgnoreCase("-c")) {
+            // si la opción es -c, el programa debe comprimir el archivo [archivo sin comprimir], entregándolo como [archivo.huff]
+            HuffmanEncoder huffmanEncoder = new HuffmanEncoder(args[2], args[1]);
+            huffmanEncoder.encode(); // implementar: comprimir el primer archivo entregado
+        } else if (args[0].equalsIgnoreCase(("-d"))) {
+            // si la opcion es -d, el programa debe descomprimir el [archivo.huff] entregando [archivo sin comprimir]
+            HuffmanDecoder huffmanDecoder = new HuffmanDecoder(args[1], args[2]);
+            huffmanDecoder.decode();
+        } else {
+            help();
+        }
 
     }
 }

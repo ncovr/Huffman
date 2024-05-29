@@ -35,27 +35,24 @@ public class HuffmanEncoder {
      * long[256] frecuencias|long largo_en_bits|bits archivo comprimido...
      */
     public void encode() {
-        long[] tablaFrecuencias = generarTablaDeFrecuencias();
-        HuffmanTree arbolH = HuffmanTree.of(tablaFrecuencias);
-        String[] encodeTable = arbolH.encodeTable();
+        long[] tablaFrecuencias = generarTablaDeFrecuencias(); // Arreglo con las frecuencias de cada carácter
+        HuffmanTree arbolH = HuffmanTree.of(tablaFrecuencias); // Arbol hecho a partir de las frecuencias
+        String[] encodeTable = arbolH.encodeTable(); // Arreglo con los códigos Huffman de cada carácter
 
-        try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile));
-             DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(outputFile))) {
+        try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile)); // Abre el archivo para leer
+             DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(outputFile))) { // Abre el archivo para escribir
 
             // Escribir las frecuencias en el archivo de salida
             escribirTablaEnArchivo(tablaFrecuencias, outputStream);
-            outputStream.writeByte(124);
+            outputStream.writeByte(124); // Escribe un | para establecer el límite de las frecuencias
 
             // Leer el archivo de entrada y generar la secuencia de bits comprimidos
-            // llega "h", tomamos el codigo ascii, buscamos el codigo huffman en el índice de "h" en ascii en la tablaFrecuencias y lo concatenamos con la salida
-            // aqui esta el problema. el orden de la codificacion debe ser en orden de lectura del archivo original
-            // Aqui tenia un problema. resulta que codificaba recorriendo la tabla de frecuencias, cuando debia ir leyendo dato por dato del inputFile e ir concatenando los codigos huffman
-            StringBuilder secuencia = new StringBuilder();
-            String lectura = String.valueOf(inputStream.read());
-
-            while(!lectura.equals("-1")){
-                secuencia.append(encodeTable[Integer.parseInt(lectura)]);
-                lectura = String.valueOf(inputStream.read());
+            StringBuilder secuencia = new StringBuilder(); // StringBuilder para ir concatenando los códigos
+            String lectura = String.valueOf(inputStream.read()); // Captura cada caracter del archivo
+            // LLega un caracter, tomamos su codigo ASCII, luego concatenamos al texto final el código Huffman presente en la posición ASCII del caracter
+            while (!lectura.equals("-1")) { // Mientras hayan caracteres por leer
+                secuencia.append(encodeTable[Integer.parseInt(lectura)]); // Concatenación: código Huffman en la posición x del arreglo. x es el código ASCII del caracter
+                lectura = String.valueOf(inputStream.read()); // Lee lo que sigue
             }
 
             // Convertir la secuencia de bits en un array de bytes
@@ -70,10 +67,11 @@ public class HuffmanEncoder {
             }
 
             // Escribir la longitud en bits y los datos comprimidos
-            outputStream.write(convertirEnteroASerieDeBits(longitudCompress).getBytes());
-            outputStream.writeByte(124);
-            outputStream.write(secuencia.toString().getBytes());
+            outputStream.write(convertirEnteroASerieDeBits(longitudCompress).getBytes()); // Escribe la cantidad de bits
+            outputStream.writeByte(124); // Escribe el separador | que establece el limite de la longitud en bits
+            outputStream.write(secuencia.toString().getBytes()); // Escribe la codificación Huffman
 
+            System.out.println("Compresión exitosa..."); // Informa por consola que se ha concluido la compresión
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -84,20 +82,21 @@ public class HuffmanEncoder {
      * Genera una tabla de frecuencias para los datos proporcionados en el archivo de entrada.
      * Esta tabla representa la frecuencia de cada byte del archivo de entrada.
      *
+     * <p>Abre el archivo a comprimir, cuenta cuantas veces se repite cada caracter. Mientras va leyendo el archivo, al toparse con un caracter arbitrario,
+     * suma 1 en la posición del caracter, el cual es el código ASCII</p>
+     *
      * @return Una array de tipo long donde cada índice representa un valor único
      * en los datos y el valor en ese índice representa la frecuencia de ese valor.
      */
     public long[] generarTablaDeFrecuencias() {
-        //abre el archivo y cuenta la frecuencia de cada byte (8bits). Cada byte se puede interpretar como un caracter
-        //de la tabla ASCII
-        long[] out = new long[256];
+        long[] out = new long[256]; // la tabla ASCII contiene 256 caracteres
         try {
             BufferedReader reader = new BufferedReader(new FileReader(inputFile));// abre el archivo
-            String linea; // representa cada linea del archivo de texto
-            while ((linea = reader.readLine()) != null) {
-                for (char character : linea.toCharArray()) { // se recorre cada caracter de la linea y se cuenta su frecuencia
-                    // contar la frecuencia. en la posición ASCII del char sumar 1
-                    out[(int) character] += 1;
+            String linea; // representa cada linea leida del archivo de texto
+            while ((linea = reader.readLine()) != null) { // lee hasta que no queden lineas por leer
+                for (char c : linea.toCharArray()) { // se recorre cada caracter de la linea y se cuenta su frecuencia
+                    // c es caracter. si pedimos c en int, nos da un número, el cual corresponde a su código en ASCII
+                    out[(int) c] += 1; // sumamos 1 en la posición que ocupa el caracter
                 }
             }
             reader.close();
@@ -116,7 +115,8 @@ public class HuffmanEncoder {
      */
     private void escribirTablaEnArchivo(long[] tabla, DataOutputStream writer) throws IOException {
         String binaryString = "";
-        for (Long l : tabla) {
+        for (Long l : tabla) { // para cada posición de la tabla
+            // se escribe su contenido en formato binario en el archivo comprimido
             binaryString = String.format("%8s", Integer.toBinaryString((int) (l & 0xFF))).replace(' ', '0');
             writer.write(binaryString.getBytes());
         }
@@ -124,8 +124,8 @@ public class HuffmanEncoder {
 
     /**
      * Funcion que convierte, por ejemplo, 8 en 00000000000000000000000000001000
-     * */
-    public String convertirEnteroASerieDeBits(int numero) {
+     */
+    private String convertirEnteroASerieDeBits(int numero) {
         StringBuilder sb = new StringBuilder();
         for (int i = 31; i >= 0; i--) {
             int bit = (numero >> i) & 1;
