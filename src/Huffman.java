@@ -22,16 +22,16 @@ public class Huffman {
     // [archivo sin comprimir] y [archivo.huff] corresponden a las rutas de los archivos
 
     public static void main(String[] args) {
-        /*// Para probar el programa sin CMD
-        String archivoInicial = ""; // Establezca ruta del archivo
-        String archivoComprimido = ""; // Establezca ruta del archivo
-        String archivoDescomprimido = ""; // Establezca ruta del archivo
+        // Para probar el programa sin CMD
+        String archivoInicial = "C:\\Users\\Nicolás Verdugo\\Desktop\\Nuevo Documento de texto.txt"; // Establezca ruta del archivo
+        String archivoComprimido = "C:\\Users\\Nicolás Verdugo\\Desktop\\Nuevo Documento de texto - copia.txt"; // Establezca ruta del archivo
+        String archivoDescomprimido = "C:\\Users\\Nicolás Verdugo\\Desktop\\Nuevo Documento de texto - copia (2).txt"; // Establezca ruta del archivo
         HuffmanEncoder huffmanEncoder = new HuffmanEncoder(archivoInicial, archivoComprimido);
         huffmanEncoder.encode(); // Codifica
         HuffmanDecoder huffmanDecoder = new HuffmanDecoder(archivoComprimido,archivoDescomprimido);
-        huffmanDecoder.decode(); // Decodifica*/
+        huffmanDecoder.decode(); // Decodifica
 
-        if (args.length < 3) {
+        /*if (args.length < 3) {
             help(); // explica que el programa espera este formato: java Huffman [opcion] [archivo.huff] [archivo sin comprimir]
         } else if (args[0].equalsIgnoreCase("-c")) {
             // si la opción es -c, el programa debe comprimir el archivo [archivo sin comprimir], entregándolo como [archivo.huff]
@@ -43,7 +43,7 @@ public class Huffman {
             huffmanDecoder.decode();
         } else {
             help();
-        }
+        }*/
 
     }
 }

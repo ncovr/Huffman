@@ -40,6 +40,11 @@ public class HuffmanDecoder {
         // Se abre el archivo para lectura por byte
         try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(inputFileName)); // Abre el archivo comprimido
              DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(outputFileName))) { // Abre el archivo descomprimido
+            if(inputStream.available() == 0){ // Si el archivo está vacío, retorna la funcion para evitar que e programa se caiga
+                File archivo = new File(inputFileName); // Se crea un objeto de la clase File para escribir en consola el nombre del archivo
+                System.out.println(archivo.getName()+" está vacío (no hay texto que decodificar)"); // Informa por consola que el archivo a decodificar se encuentra vacio
+                return; // Retorna, lo que hace que el programa termine sin errores
+            }
 
             // Hay que leer el diccionario de 256 long
             long[] diccionario = new long[256]; // frecuencias de cada caracter

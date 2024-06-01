@@ -35,12 +35,17 @@ public class HuffmanEncoder {
      * long[256] frecuencias|long largo_en_bits|bits archivo comprimido...
      */
     public void encode() {
-        long[] tablaFrecuencias = generarTablaDeFrecuencias(); // Arreglo con las frecuencias de cada carácter
-        HuffmanTree arbolH = HuffmanTree.of(tablaFrecuencias); // Arbol hecho a partir de las frecuencias
-        String[] encodeTable = arbolH.encodeTable(); // Arreglo con los códigos Huffman de cada carácter
-
         try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile)); // Abre el archivo para leer
              DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(outputFile))) { // Abre el archivo para escribir
+            if(inputStream.available() == 0){ // Verifica si el archivo está vacío. Así se evita avanzar a las siguientes líneas y provocar el fin del programa con errores
+                File archivo = new File(inputFile); // Se crea un objeto de la clase File para escribir el nombre del archivo en consola
+                System.out.println(archivo.getName()+" está vacío. Ingrese texto para codificarlo"); // Se informa por consola que el archivo está vacío y pide que se ingrese texto
+                return; // Detiene el método (no ejecuta las siguientes líneas)
+            }
+            
+            long[] tablaFrecuencias = generarTablaDeFrecuencias(); // Arreglo con las frecuencias de cada carácter
+            HuffmanTree arbolH = HuffmanTree.of(tablaFrecuencias); // Arbol hecho a partir de las frecuencias
+            String[] encodeTable = arbolH.encodeTable(); // Arreglo con los códigos Huffman de cada carácter
 
             // Escribir las frecuencias en el archivo de salida
             escribirTablaEnArchivo(tablaFrecuencias, outputStream);
